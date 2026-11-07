@@ -2,6 +2,23 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "JARVIS: Release Serial Port",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-lc",
+        "pids=$(lsof -t \"${config:jarvis.arduinoPort}\" 2>/dev/null); if [ -n \"$pids\" ]; then kill $pids; fi"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "never",
+        "panel": "shared"
+      }
+    },
+    {
       "label": "JARVIS: Verify / Compile",
       "type": "process",
       "command": "${config:jarvis.arduinoCliPath}",
@@ -50,6 +67,8 @@
     {
       "label": "JARVIS: Upload",
       "type": "process",
+      "dependsOn": "JARVIS: Release Serial Port",
+      "dependsOrder": "sequence",
       "command": "${config:jarvis.arduinoCliPath}",
       "args": [
         "upload",
@@ -75,6 +94,15 @@
       "dependsOn": [
         "JARVIS: Verify / Compile",
         "JARVIS: Upload"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "JARVIS: Release Serial Port + Verify",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "JARVIS: Release Serial Port",
+        "JARVIS: Verify / Compile"
       ],
       "problemMatcher": []
     },

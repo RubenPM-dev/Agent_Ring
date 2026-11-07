@@ -1,0 +1,34 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "JARVIS: Verify Firmware",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "\"${config:jarvis.arduinoCliPath}\" compile --fqbn \"${config:jarvis.arduinoFqbn}\" --build-path \"${workspaceFolder}/.vscode/.arduino-build\" \"${workspaceFolder}\"",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "JARVIS: Verify Then Upload",
+      "type": "node-terminal",
+      "request": "launch",
+      "preLaunchTask": "JARVIS: Release Serial Port + Verify",
+      "command": "\"${config:jarvis.arduinoCliPath}\" upload --fqbn \"${config:jarvis.arduinoFqbn}\" --port \"${config:jarvis.arduinoPort}\" \"${workspaceFolder}\"",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "JARVIS: Upload Firmware",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "\"${config:jarvis.arduinoCliPath}\" upload --fqbn \"${config:jarvis.arduinoFqbn}\" --port \"${config:jarvis.arduinoPort}\" \"${workspaceFolder}\"",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "JARVIS: Serial Monitor",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "\"${config:jarvis.arduinoCliPath}\" monitor --port \"${config:jarvis.arduinoPort}\" --config baudrate=${config:jarvis.serialBaud}",
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}
