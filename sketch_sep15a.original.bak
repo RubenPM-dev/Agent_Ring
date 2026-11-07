@@ -1,0 +1,945 @@
+#include <Adafruit_NeoPixel.h>
+#include <math.h>
+
+// ============================================================
+// HARDWARE
+// ============================================================
+
+#define LED_PIN 4
+#define LED_COUNT 72
+
+Adafruit_NeoPixel ring(
+  LED_COUNT,
+  LED_PIN,
+  NEO_GRB + NEO_KHZ800);
+
+
+// ============================================================
+// STATES
+// ============================================================
+
+enum JarvisState {
+  STATE_IDLE,
+  STATE_LISTENING,
+  STATE_THINKING,
+  STATE_SPEAKING,
+  STATE_ERROR,
+  STATE_OFF,
+  STATE_SPEAKING_DEBUG
+};
+
+JarvisState currentState = STATE_IDLE;
+
+
+// ============================================================
+// USER SETTINGS
+// ============================================================
+
+// Brightness is deliberately restricted.
+//
+// 20 = minimum allowed user brightness
+// 100 = maximum
+//
+// OFF is handled separately.
+const int MIN_BRIGHTNESS = 20;
+const int MAX_BRIGHTNESS = 100;
+
+int userBrightness = 100;
+
+
+// Default JARVIS cyan/green
+int baseR = 0;
+int baseG = 220;
+int baseB = 190;
+
+
+// ============================================================
+// VOICE
+// ============================================================
+
+float voiceLevel = 0.0f;
+float smoothedVoiceLevel = 0.0f;
+unsigned long speakingDebugStart = 0;
+
+// ============================================================
+// ANIMATION
+// ============================================================
+
+unsigned long lastFrame = 0;
+
+uint32_t animationStep = 0;
+
+
+// ============================================================
+// SERIAL INPUT
+// ============================================================
+
+// Non-blocking serial command buffer.
+// This avoids readStringUntil() interfering with animations.
+
+char commandBuffer[80];
+int commandPosition = 0;
+
+
+// ============================================================
+// SETUP
+// ============================================================
+
+void setup() {
+
+  Serial.begin(115200);
+
+  delay(500);
+
+  ring.begin();
+
+  // We perform brightness scaling ourselves.
+  ring.setBrightness(255);
+
+  ring.clear();
+  ring.show();
+
+  Serial.println();
+  Serial.println("JARVIS LED controller ready");
+  Serial.println("---------------------------");
+  Serial.println("Commands:");
+  Serial.println("IDLE");
+  Serial.println("LISTENING");
+  Serial.println("THINKING");
+  Serial.println("SPEAKING");
+  Serial.println("ERROR");
+  Serial.println("OFF");
+  Serial.println("STATE_SPEAKING_DEBUG");
+  Serial.println("LEVEL:0-255");
+  Serial.println("BRIGHTNESS:20-100");
+  Serial.println("BRIGHTNESS:+10");
+  Serial.println("BRIGHTNESS:-10");
+  Serial.println("COLOR:R,G,B");
+  Serial.println("STATUS");
+  Serial.println();
+}
+
+
+// ============================================================
+// MAIN LOOP
+// ============================================================
+
+void loop() {
+
+  readSerial();
+
+  switch (currentState) {
+
+    case STATE_IDLE:
+      effectIdle();
+      break;
+
+    case STATE_LISTENING:
+      effectListening();
+      break;
+
+    case STATE_THINKING:
+      effectThinking();
+      break;
+
+    case STATE_SPEAKING:
+      effectSpeaking();
+      break;
+
+    case STATE_ERROR:
+      effectError();
+      break;
+
+    case STATE_OFF:
+      effectOff();
+      break;
+
+    case STATE_SPEAKING_DEBUG:
+      effectSpeakingDebug();
+      break;
+  }
+}
+
+
+// ============================================================
+// NON-BLOCKING SERIAL READER
+// ============================================================
+
+void readSerial() {
+
+  while (Serial.available() > 0) {
+
+    char c = Serial.read();
+
+    // Ignore carriage return
+    if (c == '\r') {
+      continue;
+    }
+
+    // Newline = complete command
+    if (c == '\n') {
+
+      commandBuffer[commandPosition] = '\0';
+
+      if (commandPosition > 0) {
+        processCommand(commandBuffer);
+      }
+
+      commandPosition = 0;
+
+      continue;
+    }
+
+    // Add character if there's room
+    if (commandPosition < sizeof(commandBuffer) - 1) {
+
+      commandBuffer[commandPosition] = c;
+      commandPosition++;
+    }
+  }
+}
+
+
+// ============================================================
+// COMMAND PROCESSING
+// ============================================================
+
+void processCommand(String command) {
+
+  command.trim();
+
+  if (command.length() == 0) {
+    return;
+  }
+
+  command.toUpperCase();
+
+  Serial.print("Received: ");
+  Serial.println(command);
+
+
+  // ----------------------------------------------------------
+  // VOICE LEVEL
+  // ----------------------------------------------------------
+
+  if (command.startsWith("LEVEL:")) {
+
+    int value =
+      command.substring(6).toInt();
+
+    voiceLevel =
+      constrain(value, 0, 255);
+
+    return;
+  }
+
+
+  // ----------------------------------------------------------
+  // BRIGHTNESS
+  //
+  // BRIGHTNESS:60
+  // BRIGHTNESS:+10
+  // BRIGHTNESS:-10
+  // ----------------------------------------------------------
+
+  if (command.startsWith("BRIGHTNESS:")) {
+
+    String valueString =
+      command.substring(11);
+
+    valueString.trim();
+
+
+    if (
+      valueString.startsWith("+") || valueString.startsWith("-")) {
+
+      userBrightness +=
+        valueString.toInt();
+
+    } else {
+
+      userBrightness =
+        valueString.toInt();
+    }
+
+
+    userBrightness =
+      constrain(
+        userBrightness,
+        MIN_BRIGHTNESS,
+        MAX_BRIGHTNESS);
+
+
+    Serial.print("Brightness = ");
+    Serial.print(userBrightness);
+    Serial.println("%");
+
+    return;
+  }
+
+
+  // ----------------------------------------------------------
+  // COLOR
+  //
+  // COLOR:0,220,190
+  // ----------------------------------------------------------
+
+  if (command.startsWith("COLOR:")) {
+
+    String values =
+      command.substring(6);
+
+    int comma1 =
+      values.indexOf(',');
+
+    int comma2 =
+      values.indexOf(',', comma1 + 1);
+
+
+    if (
+      comma1 > 0 && comma2 > comma1) {
+
+      baseR =
+        constrain(
+          values.substring(
+                  0,
+                  comma1)
+            .toInt(),
+          0,
+          255);
+
+
+      baseG =
+        constrain(
+          values.substring(
+                  comma1 + 1,
+                  comma2)
+            .toInt(),
+          0,
+          255);
+
+
+      baseB =
+        constrain(
+          values.substring(
+                  comma2 + 1)
+            .toInt(),
+          0,
+          255);
+
+
+      Serial.print("Color = ");
+      Serial.print(baseR);
+      Serial.print(",");
+      Serial.print(baseG);
+      Serial.print(",");
+      Serial.println(baseB);
+
+    } else {
+
+      Serial.println(
+        "Invalid COLOR format");
+    }
+
+    return;
+  }
+
+
+  // ----------------------------------------------------------
+  // STATUS
+  // ----------------------------------------------------------
+
+  if (command == "STATUS") {
+
+    printStatus();
+    return;
+  }
+
+
+  // ----------------------------------------------------------
+  // STATES
+  // ----------------------------------------------------------
+
+  if (command == "IDLE") {
+
+    setState(STATE_IDLE);
+    return;
+  } else if (command == "LISTENING") {
+
+    setState(STATE_LISTENING);
+    return;
+  } else if (command == "THINKING") {
+
+    setState(STATE_THINKING);
+    return;
+  } else if (command == "SPEAKING") {
+
+    setState(STATE_SPEAKING);
+    return;
+  } else if (command == "ERROR") {
+
+    setState(STATE_ERROR);
+    return;
+  } else if (command == "OFF") {
+
+    setState(STATE_OFF);
+    return;
+  } else if (command == "STATE_SPEAKING_DEBUG") {
+
+    setState(STATE_SPEAKING_DEBUG);
+
+    speakingDebugStart = millis();
+
+    smoothedVoiceLevel = 0;
+
+    Serial.println("Speaking debug simulation started");
+
+    return;
+  } else {
+
+    Serial.println(
+      "Unknown command");
+  }
+}
+
+
+// ============================================================
+// STATE CHANGE
+// ============================================================
+
+void setState(JarvisState newState) {
+  currentState = newState;
+
+  animationStep = 0;
+  lastFrame = 0;
+
+  if (newState == STATE_SPEAKING || newState == STATE_SPEAKING_DEBUG) {
+    smoothedVoiceLevel = 0;
+  }
+
+  ring.clear();
+  ring.show();
+
+  Serial.print("State -> ");
+  Serial.println(getStateName());
+}
+
+
+// ============================================================
+// USER BRIGHTNESS
+// ============================================================
+
+float getBrightnessScale() {
+
+  // Map:
+  //
+  // user 20%  -> physical scale 0.20
+  // user 100% -> physical scale 1.00
+  //
+  // Therefore brightness never reaches zero.
+
+  return userBrightness / 100.0f;
+}
+
+
+// ============================================================
+// COLOR HELPER
+// ============================================================
+
+uint32_t scaledColor(
+  int r,
+  int g,
+  int b,
+  float effectIntensity) {
+
+  effectIntensity =
+    constrain(
+      effectIntensity,
+      0.0f,
+      1.0f);
+
+
+  float brightness =
+    getBrightnessScale();
+
+
+  float finalScale =
+    effectIntensity * brightness;
+
+
+  int finalR =
+    constrain(
+      (int)(r * finalScale),
+      0,
+      255);
+
+  int finalG =
+    constrain(
+      (int)(g * finalScale),
+      0,
+      255);
+
+  int finalB =
+    constrain(
+      (int)(b * finalScale),
+      0,
+      255);
+
+
+  return ring.Color(
+    finalR,
+    finalG,
+    finalB);
+}
+
+
+// ============================================================
+// IDLE
+//
+// Static, dim ring.
+// No animation.
+// ============================================================
+
+void effectIdle() {
+  const float idleIntensity = 0.15f;
+
+  ring.fill(
+    scaledColor(
+      baseR,
+      baseG,
+      baseB,
+      idleIntensity));
+
+  ring.show();
+}
+
+
+// ============================================================
+// LISTENING
+//
+// Strong, fast cyan pulse.
+// ============================================================
+
+void effectListening() {
+
+  const unsigned long frameTime = 10;
+
+
+  if (
+    millis() - lastFrame < frameTime) {
+    return;
+  }
+
+
+  lastFrame = millis();
+
+
+  // Faster pulse
+  float wave =
+    (sin(
+       animationStep * 0.14f)
+     + 1.0f)
+    / 2.0f;
+
+
+  // Never becomes dim like IDLE.
+  // Listening should be obvious.
+  float intensity =
+    0.45f + wave * 0.55f;
+
+
+  ring.fill(
+    scaledColor(
+      baseR,
+      baseG,
+      baseB,
+      intensity));
+
+
+  ring.show();
+
+  animationStep++;
+}
+
+
+// ============================================================
+// THINKING
+//
+// Bright spinning arc over a dim ring.
+// ============================================================
+
+void effectThinking() {
+
+  const unsigned long frameTime = 20;
+
+  if (millis() - lastFrame < frameTime) {
+    return;
+  }
+
+  lastFrame = millis();
+
+  const float backgroundIntensity = 0.08f;
+
+  // Dim full ring
+  ring.fill(
+    scaledColor(
+      baseR,
+      baseG,
+      baseB,
+      backgroundIntensity));
+
+  int center =
+    animationStep % LED_COUNT;
+
+  const int radius = 16;
+
+  for (int offset = -radius; offset <= radius; offset++) {
+
+    int distance = abs(offset);
+
+    float fade =
+      0.5f * (1.0f + cos(PI * distance / radius));
+
+    // Softer profile
+    fade = pow(fade, 1.2f);
+
+    // IMPORTANT:
+    // Fade from full brightness DOWN TO the background brightness,
+    // never down to black.
+    float intensity =
+      backgroundIntensity + fade * (1.0f - backgroundIntensity);
+
+    int pixel =
+      (center + offset + LED_COUNT) % LED_COUNT;
+
+    ring.setPixelColor(
+      pixel,
+      scaledColor(
+        baseR,
+        baseG,
+        baseB,
+        intensity));
+  }
+
+  ring.show();
+
+  animationStep++;
+}
+
+
+// ============================================================
+// SPEAKING
+//
+// Actual brightness follows LEVEL:0-255.
+// ============================================================
+
+void effectSpeaking() {
+
+  const unsigned long frameTime = 15;
+
+
+  if (
+    millis() - lastFrame < frameTime) {
+    return;
+  }
+
+
+  lastFrame = millis();
+
+
+  // ----------------------------------------------------------
+  // Fast attack
+  // ----------------------------------------------------------
+
+  if (
+    voiceLevel > smoothedVoiceLevel) {
+
+    smoothedVoiceLevel =
+      smoothedVoiceLevel * 0.25f + voiceLevel * 0.75f;
+
+  }
+
+  // ----------------------------------------------------------
+  // Slower release
+  // ----------------------------------------------------------
+
+  else {
+
+    smoothedVoiceLevel =
+      smoothedVoiceLevel * 0.80f + voiceLevel * 0.20f;
+  }
+
+
+  float normalized =
+    smoothedVoiceLevel / 255.0f;
+
+
+  // At silence, approximately the same brightness
+  // as IDLE.
+  const float speakingMinimum =
+    0.15f;
+
+
+  float baseIntensity =
+    speakingMinimum + normalized * (1.0f - speakingMinimum);
+
+
+  // Small moving texture around the ring.
+  // The effect grows stronger with voice amplitude.
+
+  for (
+    int i = 0;
+    i < LED_COUNT;
+    i++) {
+
+    float wave =
+      (sin(
+         i * 0.35f + animationStep * 0.22f)
+       + 1.0f)
+      / 2.0f;
+
+
+    float movement =
+      wave * 0.20f * normalized;
+
+
+    float intensity =
+      baseIntensity + movement;
+
+
+    intensity =
+      constrain(
+        intensity,
+        0.0f,
+        1.0f);
+
+
+    ring.setPixelColor(
+      i,
+      scaledColor(
+        baseR,
+        baseG,
+        baseB,
+        intensity));
+  }
+
+
+  ring.show();
+
+  animationStep++;
+}
+
+
+// ============================================================
+// ERROR
+//
+// Smooth red fade.
+// ============================================================
+
+void effectError() {
+
+  const unsigned long frameTime = 15;
+
+
+  if (
+    millis() - lastFrame < frameTime) {
+    return;
+  }
+
+
+  lastFrame = millis();
+
+
+  float wave =
+    (sin(
+       animationStep * 0.07f)
+     + 1.0f)
+    / 2.0f;
+
+
+  float intensity =
+    0.10f + wave * 0.90f;
+
+
+  // ERROR deliberately ignores user colour,
+  // but respects global brightness.
+  ring.fill(
+    scaledColor(
+      255,
+      0,
+      0,
+      intensity));
+
+
+  ring.show();
+
+  animationStep++;
+}
+
+
+// ============================================================
+// OFF
+// ============================================================
+
+void effectOff() {
+
+  // Calling this repeatedly is harmless,
+  // but only redraw periodically.
+
+  static unsigned long lastOffUpdate = 0;
+
+
+  if (
+    millis() - lastOffUpdate < 500) {
+    return;
+  }
+
+
+  lastOffUpdate =
+    millis();
+
+
+  ring.clear();
+  ring.show();
+}
+
+
+// ============================================================
+// STATUS / DEBUGGING
+// ============================================================
+
+void printStatus() {
+
+  Serial.println();
+  Serial.println("----- JARVIS STATUS -----");
+
+  Serial.print("State: ");
+  Serial.println(getStateName());
+
+  Serial.print("Brightness: ");
+  Serial.print(userBrightness);
+  Serial.println("%");
+
+  Serial.print("Color: ");
+  Serial.print(baseR);
+  Serial.print(",");
+  Serial.print(baseG);
+  Serial.print(",");
+  Serial.println(baseB);
+
+  Serial.print("Voice level: ");
+  Serial.println(voiceLevel);
+
+  Serial.print("Animation step: ");
+  Serial.println(animationStep);
+
+  Serial.println("-------------------------");
+  Serial.println();
+}
+
+
+// ============================================================
+// STATE NAME
+// ============================================================
+
+const char* getStateName() {
+
+  switch (currentState) {
+
+    case STATE_IDLE:
+      return "IDLE";
+
+    case STATE_LISTENING:
+      return "LISTENING";
+
+    case STATE_THINKING:
+      return "THINKING";
+
+    case STATE_SPEAKING:
+      return "SPEAKING";
+
+    case STATE_ERROR:
+      return "ERROR";
+
+    case STATE_OFF:
+      return "OFF";
+
+    case STATE_SPEAKING_DEBUG:
+      return "STATE_SPEAKING_DEBUG";
+  }
+
+
+  return "UNKNOWN";
+}
+
+//  ==================================================
+//  DEBUG
+//  ==================================================
+
+// ============================================================
+// SPEAKING DEBUG
+//
+// Simulates voice amplitude without external audio input.
+// Repeats a speech-like pattern with natural pauses.
+//
+// Uses the existing effectSpeaking() animation.
+// ============================================================
+
+void effectSpeakingDebug() {
+
+  // Each sample represents 100ms of simulated speech.
+  static const uint8_t speechPattern[] = {
+    0, 0, 18, 70, 145, 95, 35, 8,
+    0, 0, 45, 125, 210, 150, 65, 15,
+    0, 35, 105, 175, 115, 45, 0, 0,
+    65, 155, 230, 135, 55, 10, 0, 0
+  };
+
+  const uint32_t sampleInterval = 100;
+
+  const uint32_t sampleCount =
+    sizeof(speechPattern) / sizeof(speechPattern[0]);
+
+  const uint32_t phraseDuration =
+    sampleCount * sampleInterval;
+
+  // Repeat every 4.5 seconds.
+  // The remaining 1.3 seconds simulate silence.
+  const uint32_t cycleDuration = 4500;
+
+  uint32_t elapsed =
+    (millis() - speakingDebugStart) % cycleDuration;
+
+  // Default to silence.
+  voiceLevel = 0;
+
+  if (elapsed < phraseDuration) {
+
+    // Find the current sample.
+    uint32_t index =
+      elapsed / sampleInterval;
+
+    // Find the next sample.
+    uint32_t nextIndex =
+      min(index + 1, sampleCount - 1);
+
+    // Interpolate between samples for smooth transitions.
+    float fraction =
+      (elapsed % sampleInterval) / (float)sampleInterval;
+
+    float currentLevel =
+      speechPattern[index];
+
+    float nextLevel =
+      speechPattern[nextIndex];
+
+    float simulatedLevel =
+      currentLevel + (nextLevel - currentLevel) * fraction;
+
+    voiceLevel =
+      (uint8_t)(simulatedLevel + 0.5f);
+  }
+
+  // Run the real speaking animation.
+  effectSpeaking();
+}

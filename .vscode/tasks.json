@@ -1,0 +1,113 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "JARVIS: Verify / Compile",
+      "type": "process",
+      "command": "${config:jarvis.arduinoCliPath}",
+      "args": [
+        "compile",
+        "--fqbn",
+        "${config:jarvis.arduinoFqbn}",
+        "--build-path",
+        "${workspaceFolder}/.vscode/.arduino-build",
+        "${workspaceFolder}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    },
+    {
+      "label": "JARVIS: Verify / Compile (Verbose)",
+      "type": "process",
+      "command": "${config:jarvis.arduinoCliPath}",
+      "args": [
+        "compile",
+        "--verbose",
+        "--fqbn",
+        "${config:jarvis.arduinoFqbn}",
+        "--build-path",
+        "${workspaceFolder}/.vscode/.arduino-build",
+        "${workspaceFolder}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    },
+    {
+      "label": "JARVIS: Upload",
+      "type": "process",
+      "command": "${config:jarvis.arduinoCliPath}",
+      "args": [
+        "upload",
+        "--fqbn",
+        "${config:jarvis.arduinoFqbn}",
+        "--port",
+        "${config:jarvis.arduinoPort}",
+        "${workspaceFolder}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    },
+    {
+      "label": "JARVIS: Verify + Upload",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "JARVIS: Verify / Compile",
+        "JARVIS: Upload"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "JARVIS: Serial Monitor",
+      "type": "process",
+      "command": "${config:jarvis.arduinoCliPath}",
+      "args": [
+        "monitor",
+        "--port",
+        "${config:jarvis.arduinoPort}",
+        "--config",
+        "baudrate=${config:jarvis.serialBaud}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true
+      }
+    },
+    {
+      "label": "JARVIS: Debug Session",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "JARVIS: Verify / Compile (Verbose)",
+        "JARVIS: Serial Monitor"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}
