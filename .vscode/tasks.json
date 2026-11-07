@@ -76,6 +76,8 @@
         "${config:jarvis.arduinoFqbn}",
         "--port",
         "${config:jarvis.arduinoPort}",
+        "--build-path",
+        "${workspaceFolder}/.vscode/.arduino-build",
         "${workspaceFolder}"
       ],
       "options": {

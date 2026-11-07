@@ -3,7 +3,7 @@
 #include "JarvisConfig.h"
 #include "LedRing.h"
 
-JarvisState currentState = STATE_IDLE;
+JarvisState currentState = STATE_OFF;
 
 void setState(JarvisState newState) {
   currentState = newState;

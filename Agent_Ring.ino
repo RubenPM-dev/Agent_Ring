@@ -1,13 +1,13 @@
-#include "JarvisState.h"
-#include "LedRing.h"
-#include "SerialCommands.h"
-#include "StateError.h"
-#include "StateIdle.h"
-#include "StateListening.h"
-#include "StateOff.h"
-#include "StateSpeaking.h"
-#include "StateSpeakingDebug.h"
-#include "StateThinking.h"
+#include "src/JarvisState.h"
+#include "src/LedRing.h"
+#include "src/SerialCommands.h"
+#include "src/StateError.h"
+#include "src/StateIdle.h"
+#include "src/StateListening.h"
+#include "src/StateOff.h"
+#include "src/StateSpeaking.h"
+#include "src/StateSpeakingDebug.h"
+#include "src/StateThinking.h"
 
 void setup() {
   beginSerialCommands();

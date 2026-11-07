@@ -16,7 +16,7 @@ You can also open **Run and Debug** and choose a `JARVIS:` launch configuration 
 The defaults are stored in [.vscode/settings.json](./.vscode/settings.json):
 
 - FQBN: `esp32:esp32:esp32s3`
-- Port: `/dev/cu.usbmodem101`
+- Port: `/dev/cu.usbmodem1101`
 - Baud: `115200`
 
 If the board is assigned a different port, update `jarvis.arduinoPort` in the workspace settings before uploading or monitoring. The debug session exercises the existing serial protocol; source-level JTAG debugging is not configured because it requires an ESP32-S3 debug probe and OpenOCD setup.

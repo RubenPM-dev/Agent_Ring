@@ -12,6 +12,7 @@ Modular Arduino firmware for the J.A.R.V.I.S. LED ring controller.
 - Library: Adafruit NeoPixel
 
 Brightness is scaled in firmware and constrained to `20–100%`. The `OFF` state is handled independently.
+The ring boots in `OFF` and remains dark until the host sends a state command.
 
 ## Build and upload
 
@@ -21,8 +22,8 @@ With Arduino CLI:
 
 ```bash
 arduino-cli compile --fqbn esp32:esp32:esp32s3 .
-arduino-cli upload --fqbn esp32:esp32:esp32s3 --port /dev/cu.usbmodem101 .
-arduino-cli monitor --port /dev/cu.usbmodem101 --config baudrate=115200
+arduino-cli upload --fqbn esp32:esp32:esp32s3 --port /dev/cu.usbmodem1101 .
+arduino-cli monitor --port /dev/cu.usbmodem1101 --config baudrate=115200
 ```
 
 Update the serial port if the board appears under a different device name.
@@ -62,12 +63,16 @@ STATUS
 
 ## Source layout
 
-- [sketch_sep15a.ino](sketch_sep15a.ino) — setup, loop, and high-level orchestration.
-- [JarvisConfig.h/.cpp](JarvisConfig.h) — hardware constants and shared runtime settings.
-- [JarvisState.h/.cpp](JarvisState.h) — state enumeration, transitions, and state names.
-- [LedRing.h/.cpp](LedRing.h) — NeoPixel hardware access, colour scaling, and brightness handling.
-- [SerialCommands.h/.cpp](SerialCommands.h) — non-blocking serial input and command processing.
-- `State*.h/.cpp` — independent implementations for each LED state.
+- [Agent_Ring.ino](Agent_Ring.ino) — setup, loop, and high-level orchestration.
+- [src/JarvisConfig.h/.cpp](src/JarvisConfig.h) — hardware constants and shared runtime settings.
+- [src/JarvisState.h/.cpp](src/JarvisState.h) — state enumeration, transitions, and state names.
+- [src/LedRing.h/.cpp](src/LedRing.h) — NeoPixel hardware access, colour scaling, and brightness handling.
+- [src/SerialCommands.h/.cpp](src/SerialCommands.h) — non-blocking serial input and command processing.
+- `src/State*.h/.cpp` — independent implementations for each LED state.
+
+The root sketch is intentionally kept at the project root because Arduino CLI requires the
+primary `.ino` file to match the sketch folder name. Implementation modules live in `src/`
+so hardware, state, and command code stay separate from the firmware entry point.
 
 ## Compatibility
 

@@ -5,7 +5,7 @@
       "name": "JARVIS: Verify Firmware",
       "type": "node-terminal",
       "request": "launch",
-      "command": "\"${config:jarvis.arduinoCliPath}\" compile --fqbn \"${config:jarvis.arduinoFqbn}\" --build-path \"${workspaceFolder}/.vscode/.arduino-build\" \"${workspaceFolder}\"",
+      "command": "\"${config:jarvis.arduinoCliPath}\" compile --verbose --fqbn \"${config:jarvis.arduinoFqbn}\" --build-path \"${workspaceFolder}/.vscode/.arduino-build\" \"${workspaceFolder}\"",
       "cwd": "${workspaceFolder}"
     },
     {
@@ -13,21 +13,21 @@
       "type": "node-terminal",
       "request": "launch",
       "preLaunchTask": "JARVIS: Release Serial Port + Verify",
-      "command": "\"${config:jarvis.arduinoCliPath}\" upload --fqbn \"${config:jarvis.arduinoFqbn}\" --port \"${config:jarvis.arduinoPort}\" \"${workspaceFolder}\"",
+      "command": "\"${config:jarvis.arduinoCliPath}\" upload --verbose --fqbn \"${config:jarvis.arduinoFqbn}\" --port \"${config:jarvis.arduinoPort}\" --build-path \"${workspaceFolder}/.vscode/.arduino-build\" \"${workspaceFolder}\"",
       "cwd": "${workspaceFolder}"
     },
     {
       "name": "JARVIS: Upload Firmware",
       "type": "node-terminal",
       "request": "launch",
-      "command": "\"${config:jarvis.arduinoCliPath}\" upload --fqbn \"${config:jarvis.arduinoFqbn}\" --port \"${config:jarvis.arduinoPort}\" \"${workspaceFolder}\"",
+      "command": "\"${config:jarvis.arduinoCliPath}\" upload --verbose --fqbn \"${config:jarvis.arduinoFqbn}\" --port \"${config:jarvis.arduinoPort}\" --build-path \"${workspaceFolder}/.vscode/.arduino-build\" \"${workspaceFolder}\"",
       "cwd": "${workspaceFolder}"
     },
     {
       "name": "JARVIS: Serial Monitor",
       "type": "node-terminal",
       "request": "launch",
-      "command": "\"${config:jarvis.arduinoCliPath}\" monitor --port \"${config:jarvis.arduinoPort}\" --config baudrate=${config:jarvis.serialBaud}",
+      "command": "\"${config:jarvis.arduinoCliPath}\" monitor --verbose --port \"${config:jarvis.arduinoPort}\" --config baudrate=${config:jarvis.serialBaud}",
       "cwd": "${workspaceFolder}"
     }
   ]
