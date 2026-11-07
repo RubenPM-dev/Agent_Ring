@@ -21,10 +21,12 @@ The project remains an Arduino sketch and does not use PlatformIO.
 With Arduino CLI:
 
 ```bash
-arduino-cli compile --fqbn esp32:esp32:esp32s3 .
-arduino-cli upload --fqbn esp32:esp32:esp32s3 --port /dev/cu.usbmodem1101 .
+arduino-cli compile --fqbn esp32:esp32:esp32s3:USBMode=hwcdc,CDCOnBoot=cdc .
+arduino-cli upload --fqbn esp32:esp32:esp32s3:USBMode=hwcdc,CDCOnBoot=cdc --port /dev/cu.usbmodem1101 .
 arduino-cli monitor --port /dev/cu.usbmodem1101 --config baudrate=115200
 ```
+
+USB CDC on boot must be enabled because the server connects through the ESP32-S3's USB serial port and the firmware uses `Serial` for commands and replies. Without it, Arduino maps `Serial` to UART0 instead of the native USB CDC port.
 
 Update the serial port if the board appears under a different device name.
 
