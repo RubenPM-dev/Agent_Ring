@@ -7,6 +7,7 @@ constexpr uint16_t LED_COUNT = 72;
 constexpr int MIN_BRIGHTNESS = 20;
 constexpr int MAX_BRIGHTNESS = 100;
 constexpr unsigned long STATE_TRANSITION_DURATION_MS = 300;
+constexpr unsigned long STARTUP_FADE_OUT_DURATION_MS = 350;
 
 extern int userBrightness;
 extern int baseR;

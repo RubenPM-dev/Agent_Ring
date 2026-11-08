@@ -5,6 +5,7 @@
 #include "LedRing.h"
 
 void updateSpeaking() {
+  // SPEAKING maps the smoothed voice level to the ring's brightness and motion.
   const unsigned long frameTime = 15;
   if (millis() - lastFrame < frameTime) return;
   lastFrame = millis();

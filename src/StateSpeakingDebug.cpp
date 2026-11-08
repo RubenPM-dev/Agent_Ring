@@ -4,6 +4,7 @@
 #include "StateSpeaking.h"
 
 void updateSpeakingDebug() {
+  // Generate a repeatable voice waveform, then reuse the normal SPEAKING renderer.
   static const uint8_t speechPattern[] = {
     0, 0, 18, 70, 145, 95, 35, 8,
     0, 0, 45, 125, 210, 150, 65, 15,

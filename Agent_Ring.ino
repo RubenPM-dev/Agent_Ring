@@ -12,6 +12,7 @@
 void setup() {
   beginSerialCommands();
   ledRing.begin();
+  resetStartup();
   ledRing.clear();
   ledRing.show();
 }
@@ -24,6 +25,7 @@ void loop() {
     case STATE_LISTENING: updateListening(); break;
     case STATE_THINKING: updateThinking(); break;
     case STATE_THINKING_PULSATING: updateThinkingPulsating(); break;
+    case STATE_THINKING_DUO: updateThinkingDuo(); break;
     case STATE_SPEAKING: updateSpeaking(); break;
     case STATE_ERROR: updateError(); break;
     case STATE_SPEAKING_DEBUG: updateSpeakingDebug(); break;

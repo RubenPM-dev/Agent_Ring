@@ -5,6 +5,7 @@
 #include "LedRing.h"
 
 void updateError() {
+  // ERROR uses a red breathing pulse to make a fault visually distinct.
   const unsigned long frameTime = 15;
   if (millis() - lastFrame < frameTime) return;
   lastFrame = millis();

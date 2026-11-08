@@ -60,10 +60,12 @@ static void processCommand(String command) {
     return;
   }
 
-  if (command == "IDLE") setState(STATE_IDLE);
+  if (command == "STARTUP") setState(STATE_STARTUP);
+  else if (command == "IDLE") setState(STATE_IDLE);
   else if (command == "LISTENING") setState(STATE_LISTENING);
   else if (command == "THINKING") setState(STATE_THINKING);
   else if (command == "THINKING_PULSATING") setState(STATE_THINKING_PULSATING);
+  else if (command == "THINKING_DUO") setState(STATE_THINKING_DUO);
   else if (command == "SPEAKING") setState(STATE_SPEAKING);
   else if (command == "ERROR") setState(STATE_ERROR);
   else if (command == "STATE_SPEAKING_DEBUG") {
@@ -81,10 +83,12 @@ void beginSerialCommands() {
   Serial.println("JARVIS LED controller ready");
   Serial.println("---------------------------");
   Serial.println("Commands:");
+  Serial.println("STARTUP");
   Serial.println("IDLE");
   Serial.println("LISTENING");
   Serial.println("THINKING");
   Serial.println("THINKING_PULSATING");
+  Serial.println("THINKING_DUO");
   Serial.println("SPEAKING");
   Serial.println("ERROR");
   Serial.println("STATE_SPEAKING_DEBUG");

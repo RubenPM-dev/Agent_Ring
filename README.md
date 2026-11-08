@@ -48,10 +48,12 @@ For the complete host/AI serial protocol, see [RING_INTERFACE.md](RING_INTERFACE
 Send each command followed by a newline:
 
 ```text
+STARTUP
 IDLE
 LISTENING
 THINKING
 THINKING_PULSATING
+THINKING_DUO
 SPEAKING
 ERROR
 STATE_SPEAKING_DEBUG
@@ -76,7 +78,9 @@ STATUS
 
 On boot, the firmware fills the ring, performs two smooth blink cycles, and then
 transitions into `IDLE`. `THINKING_PULSATING` adds a breathing brightness pulse to
-the rotating Thinking highlight.
+the rotating Thinking highlight. Sending `STARTUP` retriggers the startup
+animation at any time. `THINKING_DUO` shows two shorter synchronized
+bright highlights on opposite sides of an otherwise dark ring.
 
 The root sketch is intentionally kept at the project root because Arduino CLI requires the
 primary `.ino` file to match the sketch folder name. Implementation modules live in `src/`
