@@ -1,6 +1,6 @@
 {
   "jarvis.arduinoCliPath": "/Applications/Arduino IDE.app/Contents/Resources/app/lib/backend/resources/arduino-cli",
   "jarvis.arduinoFqbn": "esp32:esp32:esp32s3:USBMode=hwcdc,CDCOnBoot=cdc",
-  "jarvis.arduinoPort": "/dev/cu.usbmodem1101",
+  "jarvis.arduinoPort": "/dev/cu.usbmodem101",
   "jarvis.serialBaud": "115200"
 }

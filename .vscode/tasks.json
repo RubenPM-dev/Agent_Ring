@@ -3,11 +3,11 @@
   "tasks": [
     {
       "label": "JARVIS: Release Serial Port",
-      "type": "shell",
+      "type": "process",
       "command": "bash",
       "args": [
-        "-lc",
-        "pids=$(lsof -t \"${config:jarvis.arduinoPort}\" 2>/dev/null); if [ -n \"$pids\" ]; then kill $pids; fi"
+        "${workspaceFolder}/scripts/release-serial-port.sh",
+        "${config:jarvis.arduinoPort}"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
@@ -105,6 +105,15 @@
       "dependsOn": [
         "JARVIS: Release Serial Port",
         "JARVIS: Verify / Compile"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "JARVIS: Release Serial Port + Verify (Verbose)",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "JARVIS: Release Serial Port",
+        "JARVIS: Verify / Compile (Verbose)"
       ],
       "problemMatcher": []
     },

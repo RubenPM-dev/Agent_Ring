@@ -6,11 +6,7 @@ constexpr uint8_t LED_PIN = 4;
 constexpr uint16_t LED_COUNT = 72;
 constexpr int MIN_BRIGHTNESS = 20;
 constexpr int MAX_BRIGHTNESS = 100;
-
-// Listening state uses a dedicated green signal colour.
-constexpr uint8_t LISTENING_COLOR_R = 0;
-constexpr uint8_t LISTENING_COLOR_G = 255;
-constexpr uint8_t LISTENING_COLOR_B = 0;
+constexpr unsigned long STATE_TRANSITION_DURATION_MS = 300;
 
 extern int userBrightness;
 extern int baseR;

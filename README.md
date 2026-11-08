@@ -11,8 +11,8 @@ Modular Arduino firmware for the J.A.R.V.I.S. LED ring controller.
 - Serial speed: `115200`
 - Library: Adafruit NeoPixel
 
-Brightness is scaled in firmware and constrained to `20–100%`. The `OFF` state is handled independently.
-The ring boots in `OFF` and remains dark until the host sends a state command.
+Brightness is scaled in firmware and constrained to `20–100%`. The ring boots in `IDLE`; `IDLE` clears the LEDs until the host sends another state command.
+`LISTENING` uses the same base colour as the other active states and stays steady, capped at 50% brightness (or the selected brightness if lower).
 
 ## Build and upload
 
@@ -22,8 +22,8 @@ With Arduino CLI:
 
 ```bash
 arduino-cli compile --fqbn esp32:esp32:esp32s3:USBMode=hwcdc,CDCOnBoot=cdc .
-arduino-cli upload --fqbn esp32:esp32:esp32s3:USBMode=hwcdc,CDCOnBoot=cdc --port /dev/cu.usbmodem1101 .
-arduino-cli monitor --port /dev/cu.usbmodem1101 --config baudrate=115200
+arduino-cli upload --fqbn esp32:esp32:esp32s3:USBMode=hwcdc,CDCOnBoot=cdc --port /dev/cu.usbmodem101 .
+arduino-cli monitor --port /dev/cu.usbmodem101 --config baudrate=115200
 ```
 
 USB CDC on boot must be enabled because the server connects through the ESP32-S3's USB serial port and the firmware uses `Serial` for commands and replies. Without it, Arduino maps `Serial` to UART0 instead of the native USB CDC port.
@@ -41,6 +41,8 @@ In VS Code, use **Terminal → Run Task**:
 
 The VS Code defaults are configured in [.vscode/settings.json](.vscode/settings.json). See [DEBUGGING.md](DEBUGGING.md) for details.
 
+For the complete host/AI serial protocol, see [RING_INTERFACE.md](RING_INTERFACE.md).
+
 ## Serial commands
 
 Send each command followed by a newline:
@@ -49,9 +51,9 @@ Send each command followed by a newline:
 IDLE
 LISTENING
 THINKING
+THINKING_PULSATING
 SPEAKING
 ERROR
-OFF
 STATE_SPEAKING_DEBUG
 LEVEL:0-255
 BRIGHTNESS:20-100
@@ -71,6 +73,10 @@ STATUS
 - [src/LedRing.h/.cpp](src/LedRing.h) — NeoPixel hardware access, colour scaling, and brightness handling.
 - [src/SerialCommands.h/.cpp](src/SerialCommands.h) — non-blocking serial input and command processing.
 - `src/State*.h/.cpp` — independent implementations for each LED state.
+
+On boot, the firmware fills the ring, performs two smooth blink cycles, and then
+transitions into `IDLE`. `THINKING_PULSATING` adds a breathing brightness pulse to
+the rotating Thinking highlight.
 
 The root sketch is intentionally kept at the project root because Arduino CLI requires the
 primary `.ino` file to match the sketch folder name. Implementation modules live in `src/`

@@ -63,9 +63,9 @@ static void processCommand(String command) {
   if (command == "IDLE") setState(STATE_IDLE);
   else if (command == "LISTENING") setState(STATE_LISTENING);
   else if (command == "THINKING") setState(STATE_THINKING);
+  else if (command == "THINKING_PULSATING") setState(STATE_THINKING_PULSATING);
   else if (command == "SPEAKING") setState(STATE_SPEAKING);
   else if (command == "ERROR") setState(STATE_ERROR);
-  else if (command == "OFF") setState(STATE_OFF);
   else if (command == "STATE_SPEAKING_DEBUG") {
     setState(STATE_SPEAKING_DEBUG);
     speakingDebugStart = millis();
@@ -84,9 +84,9 @@ void beginSerialCommands() {
   Serial.println("IDLE");
   Serial.println("LISTENING");
   Serial.println("THINKING");
+  Serial.println("THINKING_PULSATING");
   Serial.println("SPEAKING");
   Serial.println("ERROR");
-  Serial.println("OFF");
   Serial.println("STATE_SPEAKING_DEBUG");
   Serial.println("LEVEL:0-255");
   Serial.println("BRIGHTNESS:20-100");

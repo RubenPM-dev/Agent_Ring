@@ -12,7 +12,7 @@
       "name": "JARVIS: Verify Then Upload",
       "type": "node-terminal",
       "request": "launch",
-      "preLaunchTask": "JARVIS: Release Serial Port + Verify",
+      "preLaunchTask": "JARVIS: Release Serial Port + Verify (Verbose)",
       "command": "\"${config:jarvis.arduinoCliPath}\" upload --verbose --fqbn \"${config:jarvis.arduinoFqbn}\" --port \"${config:jarvis.arduinoPort}\" --build-path \"${workspaceFolder}/.vscode/.arduino-build\" \"${workspaceFolder}\"",
       "cwd": "${workspaceFolder}"
     },
@@ -20,6 +20,7 @@
       "name": "JARVIS: Upload Firmware",
       "type": "node-terminal",
       "request": "launch",
+      "preLaunchTask": "JARVIS: Release Serial Port",
       "command": "\"${config:jarvis.arduinoCliPath}\" upload --verbose --fqbn \"${config:jarvis.arduinoFqbn}\" --port \"${config:jarvis.arduinoPort}\" --build-path \"${workspaceFolder}/.vscode/.arduino-build\" \"${workspaceFolder}\"",
       "cwd": "${workspaceFolder}"
     },

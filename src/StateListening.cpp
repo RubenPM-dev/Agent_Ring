@@ -1,21 +1,11 @@
 #include "StateListening.h"
-#include <Arduino.h>
-#include <math.h>
 #include "JarvisConfig.h"
 #include "LedRing.h"
 
 void updateListening() {
-  const unsigned long frameTime = 10;
-  if (millis() - lastFrame < frameTime) return;
-  lastFrame = millis();
-  const float wave = (sin(animationStep * 0.14f) + 1.0f) / 2.0f;
-  const float intensity = 0.45f + wave * 0.55f;
-  ledRing.fill(ledRing.scaledColor(
-      LISTENING_COLOR_R,
-      LISTENING_COLOR_G,
-      LISTENING_COLOR_B,
-      intensity));
+  // Match the dimmest background level used by Thinking.
+  const float effectIntensity = 0.08f;
+  ledRing.fill(ledRing.scaledColor(baseR, baseG, baseB, effectIntensity));
   ledRing.show();
-  animationStep++;
 }
 
