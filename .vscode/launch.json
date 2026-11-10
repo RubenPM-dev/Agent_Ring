@@ -13,7 +13,7 @@
       "type": "node-terminal",
       "request": "launch",
       "preLaunchTask": "JARVIS: Release Serial Port + Verify (Verbose)",
-      "command": "\"${config:jarvis.arduinoCliPath}\" upload --verbose --fqbn \"${config:jarvis.arduinoFqbn}\" --port \"${config:jarvis.arduinoPort}\" --build-path \"${workspaceFolder}/.vscode/.arduino-build\" \"${workspaceFolder}\"",
+      "command": "bash \"${workspaceFolder}/scripts/arduino-cli-with-port-fallback.sh\" \"${config:jarvis.arduinoCliPath}\" upload --verbose --fqbn \"${config:jarvis.arduinoFqbn}\" --port \"${config:jarvis.arduinoPort}\" --build-path \"${workspaceFolder}/.vscode/.arduino-build\" \"${workspaceFolder}\"",
       "cwd": "${workspaceFolder}"
     },
     {
@@ -21,14 +21,14 @@
       "type": "node-terminal",
       "request": "launch",
       "preLaunchTask": "JARVIS: Release Serial Port",
-      "command": "\"${config:jarvis.arduinoCliPath}\" upload --verbose --fqbn \"${config:jarvis.arduinoFqbn}\" --port \"${config:jarvis.arduinoPort}\" --build-path \"${workspaceFolder}/.vscode/.arduino-build\" \"${workspaceFolder}\"",
+      "command": "bash \"${workspaceFolder}/scripts/arduino-cli-with-port-fallback.sh\" \"${config:jarvis.arduinoCliPath}\" upload --verbose --fqbn \"${config:jarvis.arduinoFqbn}\" --port \"${config:jarvis.arduinoPort}\" --build-path \"${workspaceFolder}/.vscode/.arduino-build\" \"${workspaceFolder}\"",
       "cwd": "${workspaceFolder}"
     },
     {
       "name": "JARVIS: Serial Monitor",
       "type": "node-terminal",
       "request": "launch",
-      "command": "\"${config:jarvis.arduinoCliPath}\" monitor --verbose --port \"${config:jarvis.arduinoPort}\" --config baudrate=${config:jarvis.serialBaud}",
+      "command": "bash \"${workspaceFolder}/scripts/arduino-cli-with-port-fallback.sh\" \"${config:jarvis.arduinoCliPath}\" monitor --verbose --port \"${config:jarvis.arduinoPort}\" --config baudrate=${config:jarvis.serialBaud}",
       "cwd": "${workspaceFolder}"
     }
   ]

@@ -1,6 +1,6 @@
 #include "SerialCommands.h"
 #include "JarvisConfig.h"
-#include "JarvisState.h"
+#include "states/JarvisState.h"
 
 namespace {
 char commandBuffer[80];
@@ -28,6 +28,7 @@ static void processCommand(String command) {
 
   if (command.startsWith("LEVEL:")) {
     voiceLevel = constrain(command.substring(6).toInt(), 0, 255);
+    lastVoiceLevelUpdate = millis();
     return;
   }
 
@@ -78,6 +79,9 @@ static void processCommand(String command) {
 
 void beginSerialCommands() {
   Serial.begin(115200);
+  // Never let a disconnected USB serial monitor block firmware animations or
+  // state transitions while diagnostic output is being written.
+  Serial.setTxTimeoutMs(0);
   delay(500);
   Serial.println();
   Serial.println("JARVIS LED controller ready");

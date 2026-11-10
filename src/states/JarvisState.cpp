@@ -1,8 +1,8 @@
 #include "JarvisState.h"
 #include <Arduino.h>
-#include "JarvisConfig.h"
-#include "LedRing.h"
-#include "StateStartup.h"
+#include "../JarvisConfig.h"
+#include "../LedRing.h"
+#include "startup/StateStartup.h"
 
 JarvisState currentState = STATE_STARTUP;
 

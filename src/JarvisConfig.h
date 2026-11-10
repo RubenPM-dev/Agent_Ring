@@ -15,6 +15,7 @@ extern int baseG;
 extern int baseB;
 extern float voiceLevel;
 extern float smoothedVoiceLevel;
+extern unsigned long lastVoiceLevelUpdate;
 extern unsigned long speakingDebugStart;
 extern unsigned long lastFrame;
 extern uint32_t animationStep;

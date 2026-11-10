@@ -1,28 +1,30 @@
 #include "StateStartup.h"
 #include <Arduino.h>
 #include <math.h>
-#include "JarvisConfig.h"
-#include "JarvisState.h"
-#include "LedRing.h"
+#include "../../JarvisConfig.h"
+#include "../JarvisState.h"
+#include "../../LedRing.h"
 
 namespace {
+// Set true to test the full fill animation. Keep false for blink-only testing.
+constexpr bool STARTUP_FILL_ENABLED = true;
 bool fillComplete = false;
 unsigned long blinkStarted = 0;
 }
 
 // Reset the startup phases so the animation can run again from the beginning.
 void resetStartup() {
-  fillComplete = false;
-  blinkStarted = 0;
+  fillComplete = !STARTUP_FILL_ENABLED;
+  blinkStarted = millis();
 }
 
 void updateStartup() {
-  // Phase 1: add one more LED to the ring every frame until it is full.
   const unsigned long frameTime = 25;
   if (millis() - lastFrame < frameTime) return;
   lastFrame = millis();
 
-  if (!fillComplete) {
+  // Phase 1: optionally add one LED per frame until the ring is full.
+  if (STARTUP_FILL_ENABLED && !fillComplete) {
     ledRing.clear();
     const int pixelsToLight = min((int)animationStep + 1, (int)LED_COUNT);
     for (int i = 0; i < pixelsToLight; i++) {
@@ -34,22 +36,18 @@ void updateStartup() {
     if (pixelsToLight >= LED_COUNT) {
       fillComplete = true;
       blinkStarted = millis();
-      Serial.print("Startup: ring filled at ");
-      Serial.print(blinkStarted);
-      Serial.println(" ms; beginning two blink cycles");
+      Serial.println("Startup: ring filled; beginning two blink cycles");
     }
     return;
   }
 
-  // Phase 2: use two 300 ms cosine cycles for smooth blink in/out motion.
+  // Phase 2: two 300 ms cosine cycles for a smooth blink in/out motion.
   const unsigned long blinkDuration = 600;
   const unsigned long elapsed = millis() - blinkStarted;
   if (elapsed >= blinkDuration) {
-    // Phase 3: switch to IDLE, which provides the black target frame. The
-    // transition helper fades the completed startup ring down to that target.
-    Serial.print("Startup: blink cycles complete at ");
-    Serial.print(millis());
-    Serial.println(" ms; fading to IDLE");
+    // Phase 3: IDLE provides the black target frame and the transition helper
+    // fades the completed startup ring smoothly to off.
+    Serial.println("Startup: blink cycles complete; fading to IDLE");
     setState(STATE_IDLE, STARTUP_FADE_OUT_DURATION_MS);
     return;
   }

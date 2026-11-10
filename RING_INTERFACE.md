@@ -75,8 +75,13 @@ LEVEL:128
 LEVEL:255
 ```
 
-Sets the speaking level from `0–255`. It is primarily used by `SPEAKING`; the
-debug speaking state generates its own simulated level values.
+Sets the current speaking amplitude from `0–255`. A host should calculate this
+from the audio waveform, normally using an RMS or peak value over a short audio
+window, normalize it to `0–255`, and send updates around `20–50` times per second.
+The host should continue sending `LEVEL:0` during pauses. If updates stop for
+approximately `150 ms`, the firmware treats the input as silence and smoothly
+decays toward the quiet intensity. The debug speaking state generates its own
+simulated level values.
 
 ### Status
 

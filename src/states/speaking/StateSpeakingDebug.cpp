@@ -1,6 +1,6 @@
 #include "StateSpeakingDebug.h"
 #include <Arduino.h>
-#include "JarvisConfig.h"
+#include "../../JarvisConfig.h"
 #include "StateSpeaking.h"
 
 void updateSpeakingDebug() {
@@ -26,6 +26,7 @@ void updateSpeakingDebug() {
     const float simulatedLevel = currentLevel + (nextLevel - currentLevel) * fraction;
     voiceLevel = (uint8_t)(simulatedLevel + 0.5f);
   }
+  lastVoiceLevelUpdate = millis();
   updateSpeaking();
 }
 

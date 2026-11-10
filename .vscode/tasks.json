@@ -69,8 +69,10 @@
       "type": "process",
       "dependsOn": "JARVIS: Release Serial Port",
       "dependsOrder": "sequence",
-      "command": "${config:jarvis.arduinoCliPath}",
+      "command": "bash",
       "args": [
+        "${workspaceFolder}/scripts/arduino-cli-with-port-fallback.sh",
+        "${config:jarvis.arduinoCliPath}",
         "upload",
         "--fqbn",
         "${config:jarvis.arduinoFqbn}",
@@ -120,8 +122,10 @@
     {
       "label": "JARVIS: Serial Monitor",
       "type": "process",
-      "command": "${config:jarvis.arduinoCliPath}",
+      "command": "bash",
       "args": [
+        "${workspaceFolder}/scripts/arduino-cli-with-port-fallback.sh",
+        "${config:jarvis.arduinoCliPath}",
         "monitor",
         "--port",
         "${config:jarvis.arduinoPort}",

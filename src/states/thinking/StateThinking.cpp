@@ -1,8 +1,8 @@
 #include "StateThinking.h"
 #include <Arduino.h>
 #include <math.h>
-#include "JarvisConfig.h"
-#include "LedRing.h"
+#include "../../JarvisConfig.h"
+#include "../../LedRing.h"
 
 namespace {
 void renderHighlight(int center, int radius, float backgroundIntensity, float peakIntensity) {

@@ -1,8 +1,8 @@
 #include "StateError.h"
 #include <Arduino.h>
 #include <math.h>
-#include "JarvisConfig.h"
-#include "LedRing.h"
+#include "../../JarvisConfig.h"
+#include "../../LedRing.h"
 
 void updateError() {
   // ERROR uses a red breathing pulse to make a fault visually distinct.

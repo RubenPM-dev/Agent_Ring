@@ -1,5 +1,5 @@
 #include "StateIdle.h"
-#include "LedRing.h"
+#include "../../LedRing.h"
 
 void updateIdle() {
   // IDLE is the off state: render an all-black target frame. State transitions

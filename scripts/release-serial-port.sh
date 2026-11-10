@@ -7,14 +7,16 @@ if [[ "$device_path" != /dev/* ]]; then
   exit 2
 fi
 if [[ ! -e "$device_path" ]]; then
-  printf 'Configured serial device does not exist: %s\n' "$device_path" >&2
-  shopt -s nullglob
-  available_ports=(/dev/cu.usbmodem* /dev/cu.usbserial*)
-  if (( ${#available_ports[@]} )); then
-    printf 'Available USB serial port(s): %s\n' "${available_ports[*]}" >&2
-  else
-    printf 'No USB serial ports are currently available. Check the cable and board connection.\n' >&2
-  fi
+  for fallback in /dev/cu.usbmodem1101 /dev/cu.usbmodem101 /dev/cu.usbserial*; do
+    if [[ -e "$fallback" ]]; then
+      printf 'Configured port unavailable; using %s\n' "$fallback" >&2
+      device_path="$fallback"
+      break
+    fi
+  done
+fi
+if [[ ! -e "$device_path" ]]; then
+  printf 'No USB serial port found. Check the cable and board connection.\n' >&2
   exit 1
 fi
 if ! command -v lsof >/dev/null 2>&1; then
