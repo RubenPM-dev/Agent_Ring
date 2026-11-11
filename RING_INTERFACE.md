@@ -27,11 +27,14 @@ THINKING_PULSATING\n
 | --- | --- |
 | `STARTUP` | Retriggers the fill-and-double-blink startup animation, then transitions to `IDLE`. |
 | `IDLE` | Turns the ring off. The current display crossfades to black. |
-| `LISTENING` | Shows the selected base colour at the dim listening intensity. |
+| `LISTENING` | Green, reacting to `LEVEL:0-255` microphone updates, capped at 50% intensity. |
+| `LISTENING_DUO_PULSATING` | Two short green orbiting sections, with no background. Each has a 2 LED core and a soft trail; `LEVEL:0-255` adjusts intensity from 15% to 100% and smoothly expands each section from a 3.5 to 10 LED radius as the voice gets louder. |
+| `LISTENING_QUAD_PULSATING` | Four short, evenly spaced green orbiting sections, with no background. Each has a 2 LED core and a soft trail; `LEVEL:0-255` adjusts intensity from 15% to 100% and smoothly expands each section from a 3.5 to 10 LED radius. The sections can overlap at high input. |
+| `SPEAKING_QUAD_PULSATING` | Four blue orbiting sections using the same voice-reactive motion and `LEVEL:0-255` intensity/radius as `LISTENING_QUAD_PULSATING`. |
 | `THINKING` | Shows a dim ring with a bright highlight rotating around it. |
 | `THINKING_PULSATING` | Shows the rotating Thinking highlight with a breathing brightness pulse. |
 | `THINKING_DUO` | Shows two shorter synchronized bright highlights rotating opposite each other around an otherwise dark ring. |
-| `SPEAKING` | Animates the ring from the current `LEVEL` value. |
+| `SPEAKING` | Animates the ring from the current `LEVEL` value using the configured base colour. |
 | `ERROR` | Shows a red pulsing error animation. |
 | `STATE_SPEAKING_DEBUG` | Runs a simulated speaking waveform without live audio input. |
 
@@ -64,7 +67,7 @@ Example:
 COLOR:0,220,190
 ```
 
-The selected base colour is used by `LISTENING`, `THINKING`,
+The selected base colour is used by `THINKING`,
 `THINKING_PULSATING`, and `SPEAKING`. `ERROR` remains red and `IDLE` remains off.
 
 ### Speaking level
@@ -131,7 +134,7 @@ Unknown command
 3. Wait for the acknowledgement or state response before sending another state command.
 4. Use `STATUS` when the current state is unknown.
 5. Prefer `THINKING_PULSATING` when the Ring should visibly indicate active processing.
-6. Use `SPEAKING` with repeated `LEVEL:0–255` updates for live voice activity.
+6. Use `LISTENING`, either `LISTENING_*_PULSATING` mode, or either speaking mode with repeated `LEVEL:0–255` updates for live voice activity. `LISTENING` is capped at 50%; the pulsating listening and speaking modes can reach 100%.
 
 `THINKING_DUO` is the serial command for the paired rotating highlight mode.
 

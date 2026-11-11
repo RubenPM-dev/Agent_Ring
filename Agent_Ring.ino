@@ -23,10 +23,13 @@ void loop() {
     case STATE_STARTUP: updateStartup(); break;
     case STATE_IDLE: updateIdle(); break;
     case STATE_LISTENING: updateListening(); break;
+    case STATE_LISTENING_DUO_PULSATING: updateListeningDuoPulsating(); break;
+    case STATE_LISTENING_QUAD_PULSATING: updateListeningQuadPulsating(); break;
     case STATE_THINKING: updateThinking(); break;
     case STATE_THINKING_PULSATING: updateThinkingPulsating(); break;
     case STATE_THINKING_DUO: updateThinkingDuo(); break;
     case STATE_SPEAKING: updateSpeaking(); break;
+    case STATE_SPEAKING_QUAD_PULSATING: updateSpeakingQuadPulsating(); break;
     case STATE_ERROR: updateError(); break;
     case STATE_SPEAKING_DEBUG: updateSpeakingDebug(); break;
   }

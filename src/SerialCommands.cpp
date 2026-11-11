@@ -64,10 +64,13 @@ static void processCommand(String command) {
   if (command == "STARTUP") setState(STATE_STARTUP);
   else if (command == "IDLE") setState(STATE_IDLE);
   else if (command == "LISTENING") setState(STATE_LISTENING);
+  else if (command == "LISTENING_DUO_PULSATING") setState(STATE_LISTENING_DUO_PULSATING);
+  else if (command == "LISTENING_QUAD_PULSATING") setState(STATE_LISTENING_QUAD_PULSATING);
   else if (command == "THINKING") setState(STATE_THINKING);
   else if (command == "THINKING_PULSATING") setState(STATE_THINKING_PULSATING);
   else if (command == "THINKING_DUO") setState(STATE_THINKING_DUO);
   else if (command == "SPEAKING") setState(STATE_SPEAKING);
+  else if (command == "SPEAKING_QUAD_PULSATING") setState(STATE_SPEAKING_QUAD_PULSATING);
   else if (command == "ERROR") setState(STATE_ERROR);
   else if (command == "STATE_SPEAKING_DEBUG") {
     setState(STATE_SPEAKING_DEBUG);
@@ -90,10 +93,13 @@ void beginSerialCommands() {
   Serial.println("STARTUP");
   Serial.println("IDLE");
   Serial.println("LISTENING");
+  Serial.println("LISTENING_DUO_PULSATING");
+  Serial.println("LISTENING_QUAD_PULSATING");
   Serial.println("THINKING");
   Serial.println("THINKING_PULSATING");
   Serial.println("THINKING_DUO");
   Serial.println("SPEAKING");
+  Serial.println("SPEAKING_QUAD_PULSATING");
   Serial.println("ERROR");
   Serial.println("STATE_SPEAKING_DEBUG");
   Serial.println("LEVEL:0-255");

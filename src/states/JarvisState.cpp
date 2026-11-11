@@ -19,7 +19,8 @@ void setState(JarvisState newState, unsigned long transitionDurationMs) {
   currentState = newState;
   animationStep = 0;
   lastFrame = 0;
-  if (newState == STATE_SPEAKING || newState == STATE_SPEAKING_DEBUG) smoothedVoiceLevel = 0;
+  if (newState == STATE_LISTENING || newState == STATE_LISTENING_DUO_PULSATING || newState == STATE_LISTENING_QUAD_PULSATING
+      || newState == STATE_SPEAKING || newState == STATE_SPEAKING_QUAD_PULSATING || newState == STATE_SPEAKING_DEBUG) smoothedVoiceLevel = 0;
   if (changingState && newState == STATE_IDLE) {
     // Establish the black target frame immediately; LedRing blends it from the
     // captured frame over the requested transition duration.
@@ -38,10 +39,13 @@ const char* getStateName() {
     case STATE_STARTUP: return "STARTUP";
     case STATE_IDLE: return "IDLE";
     case STATE_LISTENING: return "LISTENING";
+    case STATE_LISTENING_DUO_PULSATING: return "LISTENING_DUO_PULSATING";
+    case STATE_LISTENING_QUAD_PULSATING: return "LISTENING_QUAD_PULSATING";
     case STATE_THINKING: return "THINKING";
     case STATE_THINKING_PULSATING: return "THINKING_PULSATING";
     case STATE_THINKING_DUO: return "THINKING_DUO";
     case STATE_SPEAKING: return "SPEAKING";
+    case STATE_SPEAKING_QUAD_PULSATING: return "SPEAKING_QUAD_PULSATING";
     case STATE_ERROR: return "ERROR";
     case STATE_SPEAKING_DEBUG: return "STATE_SPEAKING_DEBUG";
   }

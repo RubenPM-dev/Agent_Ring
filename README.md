@@ -12,7 +12,7 @@ Modular Arduino firmware for the J.A.R.V.I.S. LED ring controller.
 - Library: Adafruit NeoPixel
 
 Brightness is scaled in firmware and constrained to `20–100%`. The ring boots in `IDLE`; `IDLE` clears the LEDs until the host sends another state command.
-`LISTENING` uses the same base colour as the other active states and stays steady, capped at 50% brightness (or the selected brightness if lower).
+The default base colour is teal. `LISTENING` is green and reacts to incoming `LEVEL:0-255` microphone updates, capped at 50% intensity. `LISTENING_DUO_PULSATING` has two short green orbiting sections; `LISTENING_QUAD_PULSATING` has four. `SPEAKING_QUAD_PULSATING` uses the same four-section orbit in blue and follows assistant audio levels. These modes have no background. Each section has a 2 LED core with a soft trail; level adjusts intensity from 15% to 100% and expands the sections from a 3.5 to 10 LED radius. Sections may overlap at high input. The pattern fades into the next state during the normal state transition. All modes respect the selected brightness.
 
 ## Build and upload
 
@@ -51,6 +51,9 @@ Send each command followed by a newline:
 STARTUP
 IDLE
 LISTENING
+LISTENING_DUO_PULSATING
+LISTENING_QUAD_PULSATING
+SPEAKING_QUAD_PULSATING
 THINKING
 THINKING_PULSATING
 THINKING_DUO

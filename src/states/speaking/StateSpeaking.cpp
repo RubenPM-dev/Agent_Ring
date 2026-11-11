@@ -4,6 +4,7 @@
 #include "../../JarvisConfig.h"
 #include "../JarvisState.h"
 #include "../../LedRing.h"
+#include "../VoiceOrbit.h"
 
 void updateSpeaking() {
   // SPEAKING maps the live audio envelope to the ring's brightness and motion.
@@ -33,5 +34,10 @@ void updateSpeaking() {
   }
   ledRing.show();
   animationStep++;
+}
+
+void updateSpeakingQuadPulsating() {
+  // Four blue orbiting highlights follow the assistant's live audio level.
+  updateVoiceOrbitPulsating(4, 0, 96, 255);
 }
 
